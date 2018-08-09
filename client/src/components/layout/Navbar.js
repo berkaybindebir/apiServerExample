@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 
 class Navbar extends Component {
   render() {
     return (
       <nav className="navbar navbar-expand-sm navbar-dark bg-dark mb-4">
         <div className="container">
-          <a className="navbar-brand" href="landing.html">DevConnector</a>
+          <Link className="navbar-brand" to="/">DevConnector</Link>
           <button
             className="navbar-toggler"
             type="button"
@@ -20,19 +21,19 @@ class Navbar extends Component {
             id="mobile-nav">
             <ul className="navbar-nav mr-auto">
               <li className="nav-item">
-                <a className="nav-link" href="profiles.html"> Developers
-                </a>
+                <Link className="nav-link" to="/profiles"> Developers
+                </Link>
               </li>
             </ul>
 
             <ul className="navbar-nav ml-auto">
               <li className="nav-item">
-                <a className="nav-link" href="register.html">
+                <Link className="nav-link" to="/register">
                   Sign Up
-                </a>
+                </Link>
               </li>
               <li className="nav-item">
-                <a className="nav-link" href="login.html">Login</a>
+                <Link className="nav-link" to="/login">Login</Link>
               </li>
             </ul>
           </div>
