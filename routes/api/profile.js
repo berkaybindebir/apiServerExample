@@ -8,7 +8,7 @@ const validateExperienceInput = require('../../validation/experience');
 const validateEducationInput = require('../../validation/education');
 
 const Profile = require('../../models/Profile');
-const Users = require('../../models/Users');
+const Users = require('../../models/User');
 
 const Auth = require('../../config/isAuth');
 

@@ -13,7 +13,7 @@ const validateLoginInput = require('../../validation/login');
 const Auth = require('../../config/isAuth');
 
 // Load User Model
-const User = require('../../models/Users')
+const User = require('../../models/User')
 
 // GET api/users/register
 // register
