@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 
 const validateProfileInput = require('../../validation/profile');
+const validateExperienceInput = require('../../validation/experience');
+const validateEducationInput = require('../../validation/education');
 
 const Profile = require('../../models/Profile');
 const Users = require('../../models/Users');
@@ -38,7 +40,9 @@ router.get(
  * @desc  Get profile by id
  * @access Public
  */
-router.get('/user/:user_id', (req, res) => {
+router.get(
+  '/user/:user_id',
+  (req, res) => {
   const errors = {};
 
   Profile.findOne({ handle: req.params.user_id })
@@ -105,7 +109,7 @@ router.get('/handle/:handle', (req, res) => {
  */
 router.post(
   '/',
-  passport.authenticate('jwt', { session: false }),
+  Auth,
   (req, res) => {
     const { errors, isValid } = validateProfileInput(req.body);
 
@@ -158,7 +162,144 @@ router.post(
             new Profile(profileFields).save().then(profile => res.json(profile))
           })
         }
-      })
+    })
+  }
+);
+
+/**
+ * @route POST api/profile/experience
+ * @desc Add experience to profile
+ * @access Private
+ */
+router.post(
+  '/experience',
+  Auth,
+  (req, res) => {
+
+  const { errors, isValid } = validateExperienceInput(req.body);
+
+  // Check Validation
+  if (!isValid) {
+    // Return any errors with 400 status
+    return res.status(400).json(errors);
+  }
+  Profile.findOne({ user: req.user.id})
+    .then(profile => {
+      const newExp = {
+        title: req.body.title,
+        company: req.body.company,
+        location: req.body.location,
+        from: req.body.from,
+        to: req.body.to,
+        current: req.body.current,
+        description: req.body.description
+      }
+
+      profile.experience.unshift(newExp);
+
+      profile.save().then(profile => res.json(profile));
+    })
+})
+
+/**
+ * @route POST api/profile/education
+ * @desc Add education to profile
+ * @access Private
+ */
+router.post(
+  '/education',
+  Auth,
+  (req, res) => {
+
+  const { errors, isValid } = validateEducationInput(req.body);
+
+  // Check Validation
+  if (!isValid) {
+    // Return any errors with 400 status
+    return res.status(400).json(errors);
+  }
+  Profile.findOne({ user: req.user.id})
+    .then(profile => {
+      const newEdu = {
+        school: req.body.school,
+        degree: req.body.degree,
+        fieldofstudy: req.body.fieldofstudy,
+        from: req.body.from,
+        to: req.body.to,
+        current: req.body.current,
+        description: req.body.description
+      }
+
+      profile.education.unshift(newEdu);
+
+      profile.save().then(profile => res.json(profile));
+    })
+})
+
+/**
+ * @route Delete api/profile/experience/:exp_id
+ * @desc Delete experience to profile
+ * @access Private
+ */
+router.delete(
+  '/experience/:exp_id',
+  Auth,
+  (req, res) => {
+
+  Profile.findOne({ user: req.user.id}).then(profile => {
+  // Get remove index
+  const removeIndex = profile.experience
+    .map(item => item.id)
+    .indexOf(req.params.exp_id)
+
+  // Splice out of array
+  profile.experience.splice(removeIndex, 1);
+
+  // Save
+  profile.save().then(profile => res.json(profile));
+  })
+  .catch(err => res.status(404).json(err));
+});
+
+/**
+ * @route Delete api/profile/education/:exp_id
+ * @desc Delete education to profile
+ * @access Private
+ */
+router.delete(
+  '/education/:edu_id',
+  Auth,
+  (req, res) => {
+
+  Profile.findOne({ user: req.user.id}).then(profile => {
+  // Get remove index
+  const removeIndex = profile.education
+    .map(item => item.id)
+    .indexOf(req.params.exp_id)
+
+  // Splice out of array
+  profile.education.splice(removeIndex, 1);
+
+  // Save
+  profile.save().then(profile => res.json(profile));
+  })
+  .catch(err => res.status(404).json(err));
+});
+
+/**
+ * @route Delete api/profile/
+ * @desc Delete user and profile
+ * @access Private
+ */
+router.delete(
+  '/',
+  Auth,
+  (req, res) => {
+  Profile.findOneAndRemove({ user: req.user.id })
+    .then(() => {
+      User.findOneAndRemove({ _id: req.user.id })
+        .then(() => res.json({ success: true }));
+    })
 });
 
 module.exports = router;
